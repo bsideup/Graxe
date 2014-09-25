@@ -1,0 +1,69 @@
+buildscript {
+    repositories {
+        ivy {
+            artifactPattern "../build/libs/[artifact]-[revision].[ext]"
+        }
+    }
+    
+    dependencies {
+        classpath "ru.trylogic.gradle.plugins:graxe:0.1.0"
+    }
+}
+
+apply plugin: 'base'
+
+subprojects {
+    apply plugin: 'graxe'
+    repositories {
+        haxe {
+            haxeOrg()
+            neko()
+            haxeLib()
+        }
+    }
+
+    dependencies {
+        haxeSdk("3.0.0")
+        neko()
+    }
+}
+
+project(":targetsModule") {
+    sourceSets {
+        main {
+            haxe {
+                srcDir defaultSet()
+                srcDir 'src/main/haxe-flash'
+            }
+        }
+    }
+
+    haxe {
+        targets {
+            neko {
+                mainClass "TestNeko"
+
+                finalName "test.n"
+            }
+
+            swf {
+                mainClass "TestSwf"
+            }
+
+            java {
+                mainClass "TestJava"
+            }
+
+            js {
+                mainClass "TestJava"
+            }
+        }
+    }
+
+    dependencies {
+        compile project(":libraryModule")
+        
+        compile haxeLib("tjson", "1.2.3")
+        compile haxeLib("actuate", "1.7.5")
+    }
+}
