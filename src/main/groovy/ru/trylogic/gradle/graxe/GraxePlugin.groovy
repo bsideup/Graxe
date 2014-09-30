@@ -53,7 +53,7 @@ class GraxePlugin implements Plugin<ProjectInternal> {
         mainSourceSet.haxe.srcDir(HaxeSourceDirectorySet.DEFAULT)
         sourceSets.add(mainSourceSet)
 
-        project.repositories.extensions.create(HaxeRepositories.NAME, HaxeRepositories, project.repositories)
+        project.repositories.extensions.create(HaxeRepositories.NAME, HaxeRepositories, project.repositories, project.services)
 
         project.dependencies.metaClass.haxeSdk = { String version = "3.1.3" ->
             def spec = "$HAXE_SDK_DEFAULT_GROUP:$HAXE_SDK_DEFAULT_ARTIFACT_ID:$version:${getPlatformClasifier()}"
@@ -66,7 +66,7 @@ class GraxePlugin implements Plugin<ProjectInternal> {
         }
 
         project.dependencies.metaClass.haxeLib = { String artifactId, String version ->
-            return [group : "lib.haxe.org", name : artifactId, version : version, ext : "zip"]
+            return [group : "lib.haxe.org", name : artifactId, version : version, ext : "har"]
         }
 
         project.tasks.create(InstallSDKTask.NAME, InstallSDKTask)
