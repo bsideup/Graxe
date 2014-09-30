@@ -9,7 +9,6 @@ import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.internal.nativeplatform.services.FileSystems
 import org.gradle.internal.reflect.Instantiator
 import ru.trylogic.gradle.graxe.GraxePlugin
-import ru.trylogic.gradle.graxe.utils.HaxeLibUtils
 
 @ToString
 class HaxeExtension {
@@ -56,11 +55,6 @@ class HaxeExtension {
         return new File(new File(getSdkPathFile(), ".haxelib").text, resolvedArtifact.name)
     }
     
-    File getHaxeLibArtifactFile(ResolvedArtifact resolvedArtifact) {
-        def version = HaxeLibUtils.getHaxeVersionFromNormal(resolvedArtifact.moduleVersion.id.version)  
-        return new File(getHaxeLibDirectoryFile(resolvedArtifact), version)
-    }
-
     ResolvedArtifact getResolvedNekoArtifact() {
         return getResolvedArtifactFromConfiguration(GraxePlugin.NEKO_CONFIGURATION)
     }

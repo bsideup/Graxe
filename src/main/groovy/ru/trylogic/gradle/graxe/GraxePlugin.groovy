@@ -8,6 +8,7 @@ import org.gradle.api.plugins.BasePlugin
 import org.gradle.internal.os.OperatingSystem
 import org.gradle.internal.reflect.Instantiator
 import org.gradle.language.base.plugins.LanguageBasePlugin
+
 import ru.trylogic.gradle.graxe.extensions.HaxeExtension
 import ru.trylogic.gradle.graxe.repository.HaxeRepositories
 import ru.trylogic.gradle.graxe.source.*
@@ -28,15 +29,13 @@ class GraxePlugin implements Plugin<ProjectInternal> {
     static final String HAXE_SDK_DEFAULT_ARTIFACT_ID = "haxe"
     static final String NEKO_DEFAULT_ARTIFACT_ID = "neko"
     
-    protected final BaseRepositoryFactory baseRepositoryFactory;
     protected final Instantiator instantiator;
     
     @Inject
-    GraxePlugin(BaseRepositoryFactory baseRepositoryFactory, Instantiator instantiator) {
-        this.baseRepositoryFactory = baseRepositoryFactory;
+    GraxePlugin(Instantiator instantiator) {
         this.instantiator = instantiator;
     }
-
+    
     void apply(ProjectInternal project) {
         project.plugins.apply(BasePlugin)
         project.plugins.apply(LanguageBasePlugin)
@@ -54,72 +53,16 @@ class GraxePlugin implements Plugin<ProjectInternal> {
         mainSourceSet.haxe.srcDir(HaxeSourceDirectorySet.DEFAULT)
         sourceSets.add(mainSourceSet)
 
-        project.repositories.extensions.create(HaxeRepositories.NAME, HaxeRepositories, project.repositories, baseRepositoryFactory)
+        project.repositories.extensions.create(HaxeRepositories.NAME, HaxeRepositories, project.repositories)
 
-        project.dependencies.metaClass.haxeSdk = { String version = "3.1.1" ->
-            final String platform;
-            final String ext;
-
-            switch(OperatingSystem.current()) {
-                case  OperatingSystem.WINDOWS:
-                    platform = "win";
-                    ext = "zip";
-                    break;
-                case OperatingSystem.MAC_OS:
-                    platform = "osx";
-                    ext = "tar.gz";
-                    break;
-                case [OperatingSystem.LINUX, OperatingSystem.UNIX, OperatingSystem.SOLARIS]:
-                    switch(System.getProperty("os.arch").toLowerCase()) {
-                        case "x86":
-                            platform = "linux32";
-                            break;
-                        case "amd64":
-                            platform = "linux64";
-                            break;
-                        default:
-                            throw new Exception("Unknown OS architecture")
-                    }
-                    ext = "tar.gz";
-                    break;
-                default:
-                    throw new RuntimeException("Unknown platform");
-            }
-
-            (delegate as DependencyHandler).add(HAXE_SDK_CONFIGURATION, "$HAXE_SDK_DEFAULT_GROUP:$HAXE_SDK_DEFAULT_ARTIFACT_ID:$version:$platform@$ext")
+        project.dependencies.metaClass.haxeSdk = { String version = "3.1.3" ->
+            def spec = "$HAXE_SDK_DEFAULT_GROUP:$HAXE_SDK_DEFAULT_ARTIFACT_ID:$version:${getPlatformClasifier()}"
+            (delegate as DependencyHandler).add(HAXE_SDK_CONFIGURATION, spec)
         }
 
         project.dependencies.metaClass.neko = { String version = "2.0.0" ->
-            final String platform;
-            final String ext;
-
-            switch(OperatingSystem.current()) {
-                case  OperatingSystem.WINDOWS:
-                    platform = "win";
-                    ext = "zip";
-                    break;
-                case OperatingSystem.MAC_OS:
-                    platform = "osx";
-                    ext = "tar.gz";
-                    break;
-                case [OperatingSystem.LINUX, OperatingSystem.UNIX, OperatingSystem.SOLARIS]:
-                    switch(System.getProperty("os.arch").toLowerCase()) {
-                        case "x86":
-                            platform = "linux32";
-                            break;
-                        case "amd64":
-                            platform = "linux64";
-                            break;
-                        default:
-                            throw new Exception("Unknown OS architecture")
-                    }
-                    ext = "tar.gz";
-                    break;
-                default:
-                    throw new RuntimeException("Unknown platform");
-            }
-
-            (delegate as DependencyHandler).add(NEKO_CONFIGURATION, "$HAXE_SDK_DEFAULT_GROUP:$NEKO_DEFAULT_ARTIFACT_ID:$version:$platform@$ext")
+            def spec = "$HAXE_SDK_DEFAULT_GROUP:$NEKO_DEFAULT_ARTIFACT_ID:$version:${getPlatformClasifier()}"
+            (delegate as DependencyHandler).add(NEKO_CONFIGURATION, spec)
         }
 
         project.dependencies.metaClass.haxeLib = { String artifactId, String version ->
@@ -132,5 +75,27 @@ class GraxePlugin implements Plugin<ProjectInternal> {
         project.tasks.create(GenerateHXMLTask.NAME, GenerateHXMLTask)
         project.tasks.create(CompileTask.NAME, CompileTask)
         project.tasks.create(RunTask.NAME, RunTask)
+    }
+
+    String getPlatformClasifier() {
+        switch(OperatingSystem.current()) {
+            case OperatingSystem.WINDOWS: return "win@zip";
+            case OperatingSystem.MAC_OS: return "osx@tar.gz";
+            case [OperatingSystem.LINUX, OperatingSystem.UNIX, OperatingSystem.SOLARIS]:
+                def platform;
+                switch(System.getProperty("os.arch").toLowerCase()) {
+                    case "x86":
+                        platform = "linux32";
+                        break;
+                    case "amd64":
+                        platform = "linux64";
+                        break;
+                    default:
+                        throw new Exception("Unknown OS architecture")
+                }
+                return "$platform@tar.gz";
+            default:
+                throw new RuntimeException("Unknown platform");
+        }
     }
 }

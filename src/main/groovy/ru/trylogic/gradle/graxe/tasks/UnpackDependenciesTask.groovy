@@ -8,6 +8,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.util.GFileUtils
 import ru.trylogic.gradle.graxe.GraxePlugin
 import ru.trylogic.gradle.graxe.extensions.HaxeExtension
+import ru.trylogic.gradle.graxe.utils.HaxeLibUtils
 
 class UnpackDependenciesTask extends DefaultTask {
 
@@ -31,7 +32,8 @@ class UnpackDependenciesTask extends DefaultTask {
     public void unpackConfigurationDependencies(ResolvedConfiguration resolvedConfiguration, HaxeExtension haxeExtension) {
         AntBuilder ant = null;
         for (resolvedArtifact in resolvedConfiguration.resolvedArtifacts) {
-            def destinationDirectoryFile = haxeExtension.getHaxeLibArtifactFile(resolvedArtifact)
+            def version = HaxeLibUtils.getHaxeVersionFromNormal(resolvedArtifact.moduleVersion.id.version)
+            def destinationDirectoryFile = new File(haxeExtension.getHaxeLibDirectoryFile(resolvedArtifact), version)
 
             def installedCheckFile = new File(destinationDirectoryFile, ".installed");
             if (installedCheckFile.exists()) {

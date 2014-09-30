@@ -32,7 +32,7 @@ class HaxeSdkInstaller extends ArchivedResolvedArtifactInstaller {
         ant.untar(src: artifact.file.absolutePath, dest: destination, overwrite: "true", compression: "gzip") {
             mapper {
                 globmapper(from: "build/*", to: "*")
-                globmapper(from: "haxe-3.0.0-osx/*", to: "*")
+                regexpmapper(from: "haxe-([^/]+)/(.+)", to: "\\2")
             }
         }
     }

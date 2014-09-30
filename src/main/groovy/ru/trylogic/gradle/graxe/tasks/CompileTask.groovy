@@ -21,7 +21,7 @@ class CompileTask extends DefaultTask {
             def haxeExtension = project.extensions.findByName(HaxeExtension.NAME) as HaxeExtension
             if(haxeExtension.targets.any { Target target -> target.kind == Target.Kind.JAVA }) {
                 //TODO check if already presented
-                def hxJavaDependency = project.dependencies.haxeLib("hxjava", "3.0.0-rc.1")
+                def hxJavaDependency = project.dependencies.haxeLib("hxjava", "3.1.0")
                 project.dependencies.add(GraxePlugin.BUILD_CONFIGURATION_NAME, hxJavaDependency)
             }
         }

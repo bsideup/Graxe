@@ -62,8 +62,5 @@ project(":targetsModule") {
 
     dependencies {
         compile project(":libraryModule")
-        
-        compile haxeLib("tjson", "1.2.3")
-        compile haxeLib("actuate", "1.7.5")
     }
 }
