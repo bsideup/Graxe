@@ -34,15 +34,15 @@ class HaxeExtension {
     }
 
     String getNekoPath() {
-        return nekoPath ?: graxeBaseDirResolver.withBaseDir("neko").resolve(resolvedNekoArtifact.moduleVersion.id.version).absolutePath
+        return nekoPath ?: graxeBaseDirResolver.withBaseDir("neko").resolve(resolvedNekoArtifact.moduleVersion.id.version)
     }
 
     String getSdkPath() {
-        return sdkPath ?: graxeBaseDirResolver.withBaseDir("sdk").resolve(resolvedHaxeArtifact.moduleVersion.id.version).absolutePath
+        return sdkPath ?: graxeBaseDirResolver.withBaseDir("sdk").resolve(resolvedHaxeArtifact.moduleVersion.id.version)
     }
     
     String getHaxelibPath() {
-        return haxelibPath ?: graxeBaseDirResolver.resolve("lib").absolutePath
+        return haxelibPath ?: graxeBaseDirResolver.resolve("lib")
     }
     
     ResolvedArtifact getResolvedNekoArtifact() {
