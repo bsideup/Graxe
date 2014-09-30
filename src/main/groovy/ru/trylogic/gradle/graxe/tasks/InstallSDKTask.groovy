@@ -20,7 +20,7 @@ class InstallSDKTask extends DefaultTask implements Runnable {
     void run() {
         def haxeExtension = project.extensions.findByName(HaxeExtension.NAME) as HaxeExtension
 
-        def installer = new HaxeSdkInstaller(haxeExtension.resolvedHaxeArtifact)
+        def installer = new HaxeSdkInstaller(haxeExtension.resolvedHaxeArtifact, ant)
 
         def destination = new File(haxeExtension.getSdkPath())
         

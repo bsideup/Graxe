@@ -18,7 +18,7 @@ class InstallNekoTask extends DefaultTask implements Runnable {
     void run() {
         def haxeExtension = project.extensions.findByName(HaxeExtension.NAME) as HaxeExtension
 
-        def installer = new NekoInstaller(haxeExtension.resolvedNekoArtifact)
+        def installer = new NekoInstaller(haxeExtension.resolvedNekoArtifact, ant)
         
         installer.install(new File(haxeExtension.getNekoPath()))
     }

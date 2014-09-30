@@ -7,17 +7,17 @@ import ru.trylogic.gradle.internal.installers.ArchivedResolvedArtifactInstaller
 class HaxeSdkInstaller extends ArchivedResolvedArtifactInstaller {
 
     @Override
-    protected void install(AntBuilder ant, File destination) {
+    protected void installMissing(File destination) {
         ant.delete(dir : destination)
         
-        super.install(ant, destination)
+        super.installMissing(destination)
 
         ant.chmod(dir: destination, includes: "**/haxe", perm: "+x")
         ant.chmod(dir: destination, includes: "**/haxelib", perm: "+x")
     }
     
     @Override
-    protected void untarGzTo(AntBuilder ant, File destination) {
+    protected void untarGzTo(File destination) {
         ant.untar(src: artifact.file.absolutePath, dest: destination, overwrite: "true", compression: "gzip") {
             mapper {
                 globmapper(from: "build/*", to: "*")

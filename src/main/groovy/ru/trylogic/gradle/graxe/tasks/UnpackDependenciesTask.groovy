@@ -24,38 +24,34 @@ class UnpackDependenciesTask extends DefaultTask {
     void run() {
         def haxeExtension = project.extensions.findByName(HaxeExtension.NAME) as HaxeExtension
 
-        unpackConfigurationDependencies(project.configurations.findByName(GraxePlugin.COMPILE_CONFIGURATION_NAME)?.resolvedConfiguration, haxeExtension)
-        unpackConfigurationDependencies(project.configurations.findByName(GraxePlugin.BUILD_CONFIGURATION_NAME)?.resolvedConfiguration, haxeExtension)
-    }
-
-    public void unpackConfigurationDependencies(ResolvedConfiguration resolvedConfiguration, HaxeExtension haxeExtension) {
-        AntBuilder ant = null;
-        for (resolvedArtifact in resolvedConfiguration.resolvedArtifacts) {
-            if(resolvedArtifact.extension != "har") {
-                continue;
-            }
-            
-            def version = HaxeLibUtils.getHaxeVersionFromNormal(resolvedArtifact.moduleVersion.id.version)
-
-            def haxeLibDirectoryFile = new File(haxeExtension.getHaxelibPath(), resolvedArtifact.name)
-            
-            def destinationDirectoryFile = new File(haxeLibDirectoryFile, version)
-
-            def installedCheckFile = new File(destinationDirectoryFile, ".installed");
-            if (installedCheckFile.exists()) {
-                continue;
-            }
-
-            ant = ant ?: new AntBuilder();
-            ant.unzip(src: resolvedArtifact.file, dest: destinationDirectoryFile, overwrite: false) {
-                mapper {
-                    globmapper(from: "${resolvedArtifact.name}/*", to: "*")
+        project.configurations.all {
+            for (resolvedArtifact in it.resolvedConfiguration.resolvedArtifacts) {
+                if(resolvedArtifact.extension != "har") {
+                    continue;
                 }
+
+                def version = HaxeLibUtils.getHaxeVersionFromNormal(resolvedArtifact.moduleVersion.id.version)
+
+                def haxeLibDirectoryFile = new File(haxeExtension.getHaxelibPath(), resolvedArtifact.name)
+
+                def destinationDirectoryFile = new File(haxeLibDirectoryFile, version)
+
+                def installedCheckFile = new File(destinationDirectoryFile, ".installed");
+                if (installedCheckFile.exists()) {
+                    continue;
+                }
+
+                ant.unzip(src: resolvedArtifact.file, dest: destinationDirectoryFile, overwrite: false) {
+                    mapper {
+                        globmapper(from: "${resolvedArtifact.name}/*", to: "*")
+                    }
+                }
+
+                GFileUtils.writeStringToFile(new File(haxeLibDirectoryFile, ".current"), resolvedArtifact.moduleVersion.id.version)
+
+                GFileUtils.touch(installedCheckFile)
             }
-
-            GFileUtils.writeStringToFile(new File(haxeLibDirectoryFile, ".current"), resolvedArtifact.moduleVersion.id.version)
-
-            GFileUtils.touch(installedCheckFile)
         }
     }
+
 }

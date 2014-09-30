@@ -7,19 +7,17 @@ import ru.trylogic.gradle.internal.installers.ArchivedResolvedArtifactInstaller
 class NekoInstaller extends ArchivedResolvedArtifactInstaller {
 
     @Override
-    protected void install(AntBuilder ant, File destination) {
+    protected void installMissing(File destination) {
         ant.delete(dir : destination)
-        super.install(ant, destination)
+        super.installMissing(destination)
         ant.chmod(dir: destination, includes: "**/neko", perm: "+x")
     }
 
     @Override
-    protected void untarGzTo(AntBuilder ant, File destination) {
+    protected void untarGzTo(File destination) {
         ant.untar(src: artifact.file.absolutePath, dest: destination, overwrite: "true", compression: "gzip") {
             mapper {
-                globmapper(from: "neko-2.0.0-osx/*", to: "*")
-                globmapper(from: "neko-2.0.0-linux/*", to: "*")
-                globmapper(from: "neko-2.0.0-win/*", to: "*")
+                regexpmapper(from: "neko-([^/]+)/(.+)", to: "\\2")
             }
         }
     }

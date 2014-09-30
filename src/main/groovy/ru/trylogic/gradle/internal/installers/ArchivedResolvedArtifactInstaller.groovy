@@ -1,9 +1,19 @@
 package ru.trylogic.gradle.internal.installers
 
-import groovy.transform.InheritConstructors
+import org.gradle.api.artifacts.ResolvedArtifact
 
-@InheritConstructors
 class ArchivedResolvedArtifactInstaller extends ResolvedArtifactInstaller {
+    
+    AntBuilder ant;
+
+    ArchivedResolvedArtifactInstaller(ResolvedArtifact artifact) {
+        this(artifact, new AntBuilder())
+    }
+
+    ArchivedResolvedArtifactInstaller(ResolvedArtifact artifact, AntBuilder ant) {
+        super(artifact)
+        this.ant = ant
+    }
 
     @Override
     void install(File destination) {
@@ -12,8 +22,9 @@ class ArchivedResolvedArtifactInstaller extends ResolvedArtifactInstaller {
         if(checkFile.exists()){
             return;
         }
-        AntBuilder ant = new AntBuilder()
-        install(ant, destination)
+        
+        installMissing(destination)
+        
         ant.touch(file : checkFile)
     }
     
@@ -21,24 +32,24 @@ class ArchivedResolvedArtifactInstaller extends ResolvedArtifactInstaller {
         return new File(destination, ".installed");
     }
     
-    protected void install(AntBuilder ant, File destination) {
+    protected void installMissing(File destination) {
         switch (artifact.extension) {
             case "tar.gz":
-                untarGzTo(ant, destination);
+                untarGzTo(destination);
                 break;
             case "zip":
-                unzipTo(ant, destination);
+                unzipTo(destination);
                 break;
             default:
                 throw new RuntimeException("Unknown extension: ${artifact.extension}");
         }
     }
     
-    protected void untarGzTo(AntBuilder ant, File destination) {
+    protected void untarGzTo(File destination) {
         ant.untar(src: artifact.file.absolutePath, dest: destination, overwrite: "true", compression: "gzip")
     }
     
-    protected void unzipTo(AntBuilder ant, File destination) {
+    protected void unzipTo(File destination) {
         ant.unzip(src: artifact.file.absolutePath, dest: destination, overwrite: "true")
     }
 }
