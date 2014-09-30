@@ -49,7 +49,7 @@ class HaxeRepositories {
 
     void neko() {
         repositories.ivy {
-            artifactPattern "file:///Users/bsideup/Downloads/[artifact]-[revision](-[classifier]).[ext]"
+            artifactPattern "http://nekovm.org/_media/[artifact]-[revision](-[classifier]).[ext]"
         }
     }
 }
