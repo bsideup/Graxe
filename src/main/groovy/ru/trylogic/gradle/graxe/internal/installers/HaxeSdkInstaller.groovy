@@ -13,20 +13,9 @@ class HaxeSdkInstaller extends ArchivedResolvedArtifactInstaller {
         super.install(ant, destination)
 
         ant.chmod(dir: destination, includes: "**/haxe", perm: "+x")
-
-        setupHaxelib(ant, destination)   
+        ant.chmod(dir: destination, includes: "**/haxelib", perm: "+x")
     }
     
-    protected void setupHaxelib(AntBuilder ant, File destination) {
-        def libDir = new File(destination, "lib")
-
-        ant.sequential {
-            mkdir(dir : libDir)
-            echo(file : new File(destination, ".haxelib"), message : libDir.absolutePath)
-            chmod(dir: destination, includes: "**/haxelib", perm: "+x")
-        }
-    }
-
     @Override
     protected void untarGzTo(AntBuilder ant, File destination) {
         ant.untar(src: artifact.file.absolutePath, dest: destination, overwrite: "true", compression: "gzip") {

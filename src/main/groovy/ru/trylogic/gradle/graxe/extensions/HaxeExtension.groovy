@@ -21,38 +21,28 @@ class HaxeExtension {
     
     FileResolver graxeBaseDirResolver;
 
-    FileResolver sdkBaseDirResolver;
-
-    FileResolver nekoBaseDirResolver;
-    
     File hxmlFile;
     
     String sdkPath;
     
     String nekoPath;
+    
+    String haxelibPath;
 
     File getHxmlFile() {
         return hxmlFile ?: new File(project.buildDir, project.name + ".hxml")
     }
 
-    File getNekoPathFile() {
-        getNekoBaseDirResolver().resolve(resolvedNekoArtifact.moduleVersion.id.version)
-    }
-
     String getNekoPath() {
-        return nekoPath ?: getNekoPathFile().absolutePath
+        return nekoPath ?: graxeBaseDirResolver.withBaseDir("neko").resolve(resolvedNekoArtifact.moduleVersion.id.version).absolutePath
     }
 
-    File getSdkPathFile() {
-        getSdkBaseDirResolver().resolve(resolvedHaxeArtifact.moduleVersion.id.version)
-    }
-    
     String getSdkPath() {
-        return sdkPath ?: getSdkPathFile().absolutePath
+        return sdkPath ?: graxeBaseDirResolver.withBaseDir("sdk").resolve(resolvedHaxeArtifact.moduleVersion.id.version).absolutePath
     }
     
-    File getHaxeLibDirectoryFile(ResolvedArtifact resolvedArtifact) {
-        return new File(new File(getSdkPathFile(), ".haxelib").text, resolvedArtifact.name)
+    String getHaxelibPath() {
+        return haxelibPath ?: graxeBaseDirResolver.resolve("lib").absolutePath
     }
     
     ResolvedArtifact getResolvedNekoArtifact() {
@@ -70,9 +60,6 @@ class HaxeExtension {
 
         def gradleFxUserHomeDirResolver = new BaseDirFileResolver(FileSystems.default, project.gradle.gradleUserHomeDir)
         graxeBaseDirResolver = gradleFxUserHomeDirResolver.withBaseDir("graxe")
-
-        sdkBaseDirResolver = graxeBaseDirResolver.withBaseDir("sdk");
-        nekoBaseDirResolver = graxeBaseDirResolver.withBaseDir("neko");
     }
 
     void targets(Closure cl) {

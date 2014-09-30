@@ -20,7 +20,6 @@ class GraxePlugin implements Plugin<ProjectInternal> {
 
     static final String MAIN_CONFIGURATION_NAME = "main"
     static final String COMPILE_CONFIGURATION_NAME = "compile"
-    static final String RUNTIME_CONFIGURATION_NAME = "runtime"
     static final String BUILD_CONFIGURATION_NAME = "build"
     
     static final String HAXE_SDK_CONFIGURATION = "sdk"
@@ -43,7 +42,6 @@ class GraxePlugin implements Plugin<ProjectInternal> {
         project.configurations.create(HAXE_SDK_CONFIGURATION)
         project.configurations.create(NEKO_CONFIGURATION)
         project.configurations.create(COMPILE_CONFIGURATION_NAME)
-        project.configurations.create(RUNTIME_CONFIGURATION_NAME)
         project.configurations.create(BUILD_CONFIGURATION_NAME)
         
         project.extensions.create(HaxeExtension.NAME, HaxeExtension, project);

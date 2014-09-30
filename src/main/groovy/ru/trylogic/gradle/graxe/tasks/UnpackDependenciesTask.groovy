@@ -26,14 +26,20 @@ class UnpackDependenciesTask extends DefaultTask {
 
         unpackConfigurationDependencies(project.configurations.findByName(GraxePlugin.COMPILE_CONFIGURATION_NAME)?.resolvedConfiguration, haxeExtension)
         unpackConfigurationDependencies(project.configurations.findByName(GraxePlugin.BUILD_CONFIGURATION_NAME)?.resolvedConfiguration, haxeExtension)
-        unpackConfigurationDependencies(project.configurations.findByName(GraxePlugin.RUNTIME_CONFIGURATION_NAME)?.resolvedConfiguration, haxeExtension)
     }
 
     public void unpackConfigurationDependencies(ResolvedConfiguration resolvedConfiguration, HaxeExtension haxeExtension) {
         AntBuilder ant = null;
         for (resolvedArtifact in resolvedConfiguration.resolvedArtifacts) {
+            if(resolvedArtifact.extension != "har") {
+                continue;
+            }
+            
             def version = HaxeLibUtils.getHaxeVersionFromNormal(resolvedArtifact.moduleVersion.id.version)
-            def destinationDirectoryFile = new File(haxeExtension.getHaxeLibDirectoryFile(resolvedArtifact), version)
+
+            def haxeLibDirectoryFile = new File(haxeExtension.getHaxelibPath(), resolvedArtifact.name)
+            
+            def destinationDirectoryFile = new File(haxeLibDirectoryFile, version)
 
             def installedCheckFile = new File(destinationDirectoryFile, ".installed");
             if (installedCheckFile.exists()) {
@@ -47,31 +53,9 @@ class UnpackDependenciesTask extends DefaultTask {
                 }
             }
 
-            GFileUtils.writeStringToFile(new File(haxeExtension.getHaxeLibDirectoryFile(resolvedArtifact), ".current"), resolvedArtifact.moduleVersion.id.version)
+            GFileUtils.writeStringToFile(new File(haxeLibDirectoryFile, ".current"), resolvedArtifact.moduleVersion.id.version)
 
             GFileUtils.touch(installedCheckFile)
         }
-    }
-
-    static File findHaxeLibRoot(File dir) {
-        if (!dir.isDirectory()) {
-            return null;
-        }
-
-        for(file in dir.listFiles(FileFileFilter.FILE as FileFilter)){
-            if(file.name == "haxelib.json") {
-                return file;
-            }
-        }
-
-        for(file in dir.listFiles(DirectoryFileFilter.DIRECTORY as FileFilter)){
-            def result = findHaxeLibRoot(file)
-
-            if(result != null) {
-                return result;
-            }
-        }
-
-        return null;
     }
 }
